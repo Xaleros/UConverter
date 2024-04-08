@@ -4,10 +4,40 @@
 #include <string>
 #include <vector>
 
-class FUnreal3DHeader {
-public:
-	void Serialize(std::ostream& stream);
-	void Deserialize(std::istream& stream);
+// References
+// http://www.paulbourke.net/dataformats/unreal/
+// Additional help from 3ds2unr
+
+struct FUnreal3DHeader {
+	friend std::ostream& operator<<(std::ostream& stream, const FUnreal3DHeader& hdr) {
+		stream << hdr.numPolygons;
+		stream << hdr.numVertices;
+		stream << hdr.bogusRot;
+		stream << hdr.bogusFrame;
+		stream << hdr.bogusNormX;
+		stream << hdr.bogusNormY;
+		stream << hdr.bogusNormZ;
+		stream << hdr.fixScale;
+		stream << hdr.unused;
+		stream << hdr.unknown;
+	}
+
+	friend std::istream& operator>>(std::istream& stream, FUnreal3DHeader& hdr) {
+		stream >> hdr.numPolygons;
+		stream >> hdr.numVertices;
+		stream >> hdr.bogusRot;
+		stream >> hdr.bogusFrame;
+		stream >> hdr.bogusNormX;
+		stream >> hdr.bogusNormY;
+		stream >> hdr.bogusNormZ;
+		stream >> hdr.fixScale;
+
+		for (int i = 0; i < ARRAY_SIZE(unused); i++)
+			stream >> hdr.unused[i];
+
+		for (int i = 0; i < ARRAY_SIZE(unknown); i++)
+			stream >> hdr.unknown;
+	}
 
 	uint16_t numPolygons;
 	uint16_t numVertices;
@@ -21,21 +51,41 @@ public:
 	uint8_t  unknown[12];
 };
 
-class FUnreal3DTri {
-public:
-	void Serialize(std::ostream& stream);
-	void Deserialize(std::istream& stream);
+struct FUnreal3DTri {
+	friend std::ostream& operator<<(std::ostream& stream, const FUnreal3DTri& tri) {
+		stream << tri.vertex;
+		stream << tri.type;
+		stream << tri.color;
+		stream << tri.uv;
+		stream << tri.texNum;
+		stream << tri.flags;
+	}
 
-	uint16_t vertex[3];
-	char	 type;
-	char	 color;
-	uint8_t  uv[3][2];
-	char     texNum;
-	char	 flags;
+	friend std::istream& operator>>(std::istream& stream, FUnreal3DTri& tri) {
+		stream >> tri.vertex[0];
+		stream >> tri.vertex[1];
+		stream >> tri.vertex[2];
+		stream >> tri.type;
+		stream >> tri.color;
+		stream >> tri.uv[0][0];
+		stream >> tri.uv[0][1];
+		stream >> tri.uv[1][0];
+		stream >> tri.uv[1][1];
+		stream >> tri.uv[2][0];
+		stream >> tri.uv[2][1];
+		stream >> tri.texNum;
+		stream >> tri.flags;
+	}
+
+	uint16_t vertex[3] = { 0 };
+	char	 type = 0;
+	char	 color = 255;
+	uint8_t  uv[3][2] = { 0 };
+	char     texNum = 0;
+	char	 flags = 0;
 };
 
-class FUnreal3DSeq {
-public:
+struct FUnreal3DSeq {
 	FUnreal3DSeq();
 	FUnreal3DSeq(std::string& _name, int _length);
 
@@ -43,17 +93,19 @@ public:
 	int length;
 };
 
-class FUnreal3DModel {
+class FUnrealLodMesh {
 public:
-	FUnreal3DModel();
-	virtual ~FUnreal3DModel();
+	FUnrealLodMesh();
+	virtual ~FUnrealLodMesh();
 
 	void AddVertex(FVec3f& vertex);
 	void AddPolygon(FUnreal3DTri& tri);
-	void AddTexture(std::string& name, int n);
+	void AddTexture(std::string& name, int n = -1);
 	void AddSequence(std::string& name, int len);
 
 	void Write(std::string& modelname);
+
+	FUnreal3DHeader header;
 
 private:
 	std::vector<uint32_t> vertices;
@@ -61,22 +113,9 @@ private:
 	std::vector<FUnreal3DSeq> sequences;
 	std::vector<std::string> textures;
 };
-/*
-class FUnreal3DAniv {
-public:
-	void Serialize(std::ostream& stream) {
-		stream << vertices.size() * sizeof(uint32_t) / 
-		for (FVec3f& vertex : vertices) {
-			stream << assemble_vertex(vertex);
-		}
-	}
 
-private:
-	inline uint32_t assemble_vertex(FVec3f& vertex) {
-		return	(((int)(vertex[0] * 8.0) & 0x7ff)) |
-				(((int)(vertex[1] * 8.0) & 0x7ff) << 11) |
-				(((int)(vertex[2] * 4.0) & 0x3ff) << 22);
-	}
-	std::vector<FVec3f> vertices;
+class FUnrealLodMeshConverter {
+public:
+	virtual void Read(std::string& path) = 0;
+	virtual FUnrealLodMesh Convert() = 0;
 };
-*/

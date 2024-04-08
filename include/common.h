@@ -7,19 +7,17 @@
 
 class FVec3f {
 public:
-	void Serialize(std::ostream& stream) {
-		stream << v[0];
-		stream << v[1];
-		stream << v[2];
+	friend std::ostream& operator<<(std::ostream& stream, FVec3f& vec) {
+		stream << vec;
 	}
 
-	void Deserialize(std::istream& stream) {
-		stream >> v[0];
-		stream >> v[1];
-		stream >> v[2];
+	friend std::istream& operator>>(std::istream& stream, FVec3f& vec) {
+		stream >> vec.v[0];
+		stream >> vec.v[1];
+		stream >> vec.v[2];
 	}
 
-	float operator[](int i) {
+	float& operator[](int i) {
 		return v[i];
 	}
 

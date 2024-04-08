@@ -1,63 +1,6 @@
 #include <fstream>
 #include "u_v3d.h"
 
-void FUnreal3DHeader::Serialize(std::ostream& stream)
-{
-	stream << numPolygons;
-	stream << numVertices;
-	stream << bogusRot;
-	stream << bogusFrame;
-	stream << bogusNormX;
-	stream << bogusNormY;
-	stream << bogusNormZ;
-	stream << fixScale;
-	stream << unused;
-	stream << unknown;
-}
-
-void FUnreal3DHeader::Deserialize(std::istream& stream)
-{
-	stream >> numPolygons;
-	stream >> numVertices;
-	stream >> bogusRot;
-	stream >> bogusFrame;
-	stream >> bogusNormX;
-	stream >> bogusNormY;
-	stream >> bogusNormZ;
-	stream >> fixScale;
-
-	for (int i = 0; i < ARRAY_SIZE(unused); i++)
-		stream >> unused[i];
-
-	for (int i = 0; i < ARRAY_SIZE(unknown); i++)
-		stream >> unknown;
-}
-
-void FUnreal3DTri::Serialize(std::ostream& stream) {
-	stream << vertex;
-	stream << type;
-	stream << color;
-	stream << uv;
-	stream << texNum;
-	stream << flags;
-}
-
-void FUnreal3DTri::Deserialize(std::istream& stream) {
-	stream >> vertex[0];
-	stream >> vertex[1];
-	stream >> vertex[2];
-	stream >> type;
-	stream >> color;
-	stream >> uv[0][0];
-	stream >> uv[0][1];
-	stream >> uv[1][0];
-	stream >> uv[1][1];
-	stream >> uv[2][0];
-	stream >> uv[2][1];
-	stream >> texNum;
-	stream >> flags;
-}
-
 FUnreal3DSeq::FUnreal3DSeq()
 	: name(""), length(0)
 {}
@@ -66,35 +9,37 @@ FUnreal3DSeq::FUnreal3DSeq(std::string& _name, int _length)
 	: name(_name), length(_length)
 {}
 
-FUnreal3DModel::FUnreal3DModel()
+FUnrealLodMesh::FUnrealLodMesh()
 {}
 
-FUnreal3DModel::~FUnreal3DModel()
+FUnrealLodMesh::~FUnrealLodMesh()
 {}
 
-void FUnreal3DModel::AddVertex(FVec3f& vertex) {
+void FUnrealLodMesh::AddVertex(FVec3f& vertex) {
 	vertices.push_back( (int(vertex[0]*8.0) & 0x7ff) |
 					  ( (int(vertex[1]*8.0) & 0x7ff) << 11 ) |
 					  ( (int(vertex[2]*4.0) & 0x3ff) << 22) );
 }
 
-void FUnreal3DModel::AddPolygon(FUnreal3DTri& tri) {
+void FUnrealLodMesh::AddPolygon(FUnreal3DTri& tri) {
 	polygons.push_back(tri);
 }
 
-void FUnreal3DModel::AddTexture(std::string& name, int n) {
-	if (textures.size() >= n) {
-		textures.resize(n);
+void FUnrealLodMesh::AddTexture(std::string& name, int n) {
+	if (n < 0) {
+		textures.push_back(name);
 	}
-
-	textures[n] = name;
+	else if (textures.size() >= n) {
+		textures.resize(n);
+		textures[n] = name;
+	}
 }
 
-void FUnreal3DModel::AddSequence(std::string& name, int n) {
+void FUnrealLodMesh::AddSequence(std::string& name, int n) {
 	sequences.push_back(FUnreal3DSeq(name, n));
 }
 
-void FUnreal3DModel::Write(std::string& modelname) {
+void FUnrealLodMesh::Write(std::string& modelname) {
 	std::string datafile = "Models\\" + modelname + "_d.3d";
 	std::string anivfile = "Models\\" + modelname + "_a.3d";
 
@@ -113,16 +58,14 @@ void FUnreal3DModel::Write(std::string& modelname) {
 
 	std::ofstream stream;
 
-	FUnreal3DHeader hdr;
-	memset(&hdr, 0, sizeof(hdr));
-
 	stream.open(datapath, std::ofstream::out);
-	hdr.numPolygons = polygons.size();
-	hdr.numVertices = vertices.size() / numFrames;
-	hdr.Serialize(stream);
+
+	header.numPolygons = polygons.size();
+	header.numVertices = vertices.size() / numFrames;
+	stream << header;
 
 	for (FUnreal3DTri& polygon : polygons) {
-		polygon.Serialize(stream);
+		stream << polygon;
 	}
 
 	stream.close();

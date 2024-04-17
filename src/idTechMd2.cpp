@@ -1,11 +1,16 @@
 #include <fstream>
-#include <q_md2.h>
+#include <idTechMd2.h>
 
 // References
 // http://tfc.duke.free.fr/coding/md2-specs-en.html
 
-void FMD2Model::Read(std::string& path) {
-	std::ifstream stream(path, std::istream::in);
+int FMD2Model::Read(const std::string& path) {
+	std::ifstream stream(path, std::ifstream::in | std::ifstream::binary);
+	if (!stream) {
+		std::cout << "Failed to open " << path << std::endl;
+		return -1;
+	}
+
 	stream >> header;
 
 	skins.resize(header.numSkins);
@@ -15,32 +20,38 @@ void FMD2Model::Read(std::string& path) {
 	glcmds.resize(header.numGlCmds);
 
 	stream.seekg(header.offsetSkins, std::ios_base::beg);
+	int pos = stream.tellg();
 	for (FMD2Skin& skin : skins) {
 		stream >> skin;
 	}
 
 	stream.seekg(header.offsetSt, std::ios_base::beg);
+	pos = stream.tellg();
 	for (FMD2TexCoord& tc : texcoords) {
 		stream >> tc;
 	}
 
 	stream.seekg(header.offsetTris, std::ios_base::beg);
+	pos = stream.tellg();
 	for (FMD2Triangle& tri : triangles) {
 		stream >> tri;
 	}
 
 	stream.seekg(header.numGlCmds, std::ios_base::beg);
+	pos = stream.tellg();
 	for (int& glcmd : glcmds) {
-		stream >> glcmd;
+		stream.read((char*)&glcmd, sizeof(glcmd));
 	}
 
 	stream.seekg(header.offsetFrames, std::ios_base::beg);
+	pos = stream.tellg();
 	for (FMD2Frame& frame : frames) {
 		frame.verts.resize(header.numVertices);
 		stream >> frame;
 	}
 
 	stream.close();
+	return 0;
 }
 
 FUnrealLodMesh FMD2Model::Convert() {
@@ -53,12 +64,14 @@ FUnrealLodMesh FMD2Model::Convert() {
 	for (FMD2Triangle& tri : triangles) {
 		for (int i = 0; i < 3; i++) {
 			float s = static_cast<float>(texcoords[tri.st[i]].s) / header.skinWidth;
-			float t = static_cast<float>(texcoords[tri.st[i]].t) / header.skinWidth;
+			float t = static_cast<float>(texcoords[tri.st[i]].t) / header.skinHeight;
 
 			uTri.vertex[i] = tri.v[i];
 			uTri.uv[i][0] = static_cast<uint16_t>(s * 255);
 			uTri.uv[i][1] = static_cast<uint16_t>(t * 255);
 		}
+
+		uMesh.AddPolygon(uTri);
 	}
 
 	std::string lastAnimGroup = "";
@@ -67,22 +80,17 @@ FUnrealLodMesh FMD2Model::Convert() {
 		for (FMD2Vertex& vert : frame.verts) {
 			FVec3f v;
 			for (int i = 0; i < 3; i++) {
-				v[i] = (vert.v[i] * frame.scale[i]) * frame.translate[i];
+				v[i] = (vert.v[i] * frame.scale[i]) + frame.translate[i];
 			}
 
 			uMesh.AddVertex(v);
 		}
 
 		std::string animGroup(frame.name);
-		int frameNum = 0;
-		for (int i = 0; i < animGroup.size(); i++) {
-			if (isdigit(animGroup[i])) {
-				frameNum = std::stoi(animGroup.substr(i));
-				animGroup.erase(i, animGroup.size() - i);
-			}
-		}
+		int frameNum = std::stoi(animGroup.substr(animGroup.size() - 2));
+		animGroup.erase(animGroup.size() - 2, 2);
 
-		if (lastAnimGroup.compare(animGroup) != 0) {
+		if (lastAnimGroup.size() > 0 && lastAnimGroup.compare(animGroup) != 0) {
 			uMesh.AddSequence(lastAnimGroup, lastFrameNum);
 		}
 
@@ -90,7 +98,13 @@ FUnrealLodMesh FMD2Model::Convert() {
 		lastFrameNum = frameNum;
 	}
 
+	if (lastAnimGroup.size() > 0 && lastAnimGroup.compare(frames[frames.size()-1].name) != 0) {
+		uMesh.AddSequence(lastAnimGroup, lastFrameNum);
+	}
+
 	for (FMD2Skin& skin : skins) {
 		uMesh.AddTexture(std::string(skin.name));
 	}
+
+	return uMesh;
 }

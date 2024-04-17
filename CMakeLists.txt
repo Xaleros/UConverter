@@ -3,18 +3,19 @@ cmake_minimum_required(VERSION 3.15)
 project(UConverter)
 
 set(UCONVERTER_SOURCES
-	include/common.h
-	include/u_v3d.h
-	include/u_psk.h
-	include/u_psa.h
-	include/q_mdl.h
-	include/q_md2.h
-	src/u_v3d.cpp
-	src/u_psk.cpp
-	src/u_psa.cpp
-	src/q_mdl.cpp
-	src/q_md2.cpp
-	src/main.cpp
+	include/Common.h
+	include/UnrealLodMesh.h
+	include/UnrealPsk.h
+	include/UnrealPsa.h
+	include/idTechMdl.h
+	include/idTechMd2.h
+	src/UnrealLodMesh.cpp
+	src/UnrealPsk.cpp
+	src/UnrealPsa.cpp
+	src/idTechMdl.cpp
+	src/idTechmd2.cpp
+	src/Main.cpp
+	src/Model.cpp
 )
 
 source_group("include" REGULAR_EXPRESSION "${CMAKE_CURRENT_SOURCE_DIR}/include/.+")

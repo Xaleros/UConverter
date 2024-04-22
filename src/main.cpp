@@ -28,6 +28,15 @@ int strnicmp(const char* s1, const char* s2, size_t n) {
 }
 #endif
 
+std::string GetFileExt(const std::string& path) {
+	std::string ext("");
+	size_t extDot = path.find_last_of('.');
+	if (extDot != std::string::npos) {
+		ext = path.substr(extDot + 1);
+	}
+	return ext;
+}
+
 static EAssetType GetAssetType(const char* type) {
 	for (FAssetType t : typeTable) {
 		if (strnicmp(type, t.name, strlen(t.name)) == 0) {

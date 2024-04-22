@@ -96,14 +96,7 @@ struct FQuatf {
 
 //////////////////////////////////////////////////////////////////////////
 
-std::string GetFileExt(const std::string& path) {
-	std::string ext("");
-	size_t extDot = path.find_last_of('.');
-	if (extDot != std::string::npos) {
-		ext = path.substr(extDot + 1);
-	}
-	return ext;
-}
+std::string GetFileExt(const std::string& path);
 
 //////////////////////////////////////////////////////////////////////////
 

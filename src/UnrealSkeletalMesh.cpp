@@ -57,7 +57,7 @@ int FUnrealSkeletalMesh::Read(const std::string& path) {
 
 	// PSK vertices
 	stream >> chunk;
-	if (!chunk.IsValid(pskVtwx0000, sizeof(FUnrealVertex))) {
+	if (!chunk.IsValid(pskVtxw0000, sizeof(FUnrealVertex))) {
 		std::cout << "VTXW0000 chunk invalid or missing in " << pskPath << std::endl;
 		return -1;
 	}
@@ -295,10 +295,11 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 
 	// TODO: write UC file
 	// TODO: FUnrealScriptFile, use in FUnrealLodMesh
+	return 0;
 }
 
 int FUnrealSkeletalMesh::Test(const std::string& path) {
-
+	return -1;
 }
 
 int FUnrealSkeletalMesh::AddPoint(const FVec3f& p) {
@@ -324,7 +325,9 @@ int FUnrealSkeletalMesh::AddVertex(const FUnrealVertex& v) {
 }
 
 int FUnrealSkeletalMesh::AddTriangle(const FUnrealTriangle& t) {
+	int i = faces.size();
 	faces.push_back(t);
+	return i;
 }
 
 int FUnrealSkeletalMesh::AddMaterial(const FUnrealMaterial& m) {
@@ -349,16 +352,22 @@ int FUnrealSkeletalMesh::AddBone(const FUnrealBone& b) {
 	return i;
 }
 
-int FUnrealSkeletalMesh::AddWeight(const FUnrealBoneWeight& i) {
-	weights.push_back(i);
+int FUnrealSkeletalMesh::AddWeight(const FUnrealBoneWeight& w) {
+	int i = weights.size();
+	weights.push_back(w);
+	return i;
 }
 
 int FUnrealSkeletalMesh::AddAnimation(const FUnrealAnimInfo& a) {
+	int i = animations.size();
 	animations.push_back(a);
+	return i;
 }
 
-int FUnrealSkeletalMesh::AddAnimKey(const FUnrealQuatAnimKey& a) {
-	animKeys.push_back(a);
+int FUnrealSkeletalMesh::AddAnimKey(const FUnrealQuatAnimKey& k) {
+	int i = animKeys.size();
+	animKeys.push_back(k);
+	return i;
 }
 
 void FUnrealSkeletalMesh::GetPskPsaPaths(const std::string& path, std::string& pskPath, std::string& psaPath) {

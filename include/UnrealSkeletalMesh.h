@@ -315,9 +315,9 @@ public:
 	int AddTriangle(const FUnrealTriangle& t);
 	int AddMaterial(const FUnrealMaterial& m);
 	int AddBone(const FUnrealBone& b);
-	int AddWeight(const FUnrealBoneWeight& i);
+	int AddWeight(const FUnrealBoneWeight& w);
 	int AddAnimation(const FUnrealAnimInfo& a);
-	int AddAnimKey(const FUnrealQuatAnimKey& a);
+	int AddAnimKey(const FUnrealQuatAnimKey& k);
 
 private:
 	void GetPskPsaPaths(const std::string& path, std::string& pskPath, std::string& psaPath);

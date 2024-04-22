@@ -50,6 +50,7 @@ static void PrintHelp() {
 	std::cout << "UConverter [-i <input path>] [-o <output path>] <args>" << std::endl << std::endl;
 	std::cout << "optional arguments:" << std::endl;
 	std::cout << "\t-t <asset type>" << std::endl;
+	std::cout << "\t-T <path>" << std::endl;
 }
 
 static int Error(const char* msg) {
@@ -69,6 +70,7 @@ void NormalizeDirectoryString(std::string& s) {
 }
 
 int main(int argc, char** argv) {
+	bool testMode = false;
 	std::string outputPath;
 	std::string assetPath;
 	std::string assetExt;
@@ -79,6 +81,10 @@ int main(int argc, char** argv) {
 		if (arg[0] == '-') {
 			i++;
 			switch (arg[1]) {
+			case 'T':
+				testMode = true;
+				assetPath.assign(argv[i]);
+				break;
 			case 't':
 				assetExt = argv[i];
 				assetType = GetAssetType(argv[i]);
@@ -97,18 +103,16 @@ int main(int argc, char** argv) {
 		return Error("Required argument [-i <input path>] missing");
 	}
 
-	if (outputPath.size() == 0) {
+	if (outputPath.size() == 0 && !testMode) {
 		return Error("Required argument [-o <output path>] missing");
 	}
 
 	// Check file extension
 	if (assetType == AST_NONE) {
-		size_t extDot = assetPath.find_last_of('.');
-		if (extDot == std::string::npos) {
-			return Error("Unknown file extension - please specify [-t <asset type>]");
+		assetExt = GetFileExt(assetPath);
+		if (assetExt.size() == 0) {
+			return Error("No file extension - please specify [-t <asset type>]");
 		}
-
-		assetExt = assetPath.substr(extDot+1);
 		assetType = GetAssetType(assetExt.c_str());
 	}
 
@@ -121,7 +125,7 @@ int main(int argc, char** argv) {
 
 	switch (assetType) {
 	case AST_MODEL:
-		rc = ConvertModel(assetPath, assetExt, outputPath);
+		rc = ConvertModel(assetPath, assetExt, outputPath, testMode);
 		break;
 	default:
 		return Error("Unknown asset type");

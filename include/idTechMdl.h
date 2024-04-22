@@ -8,8 +8,22 @@
 
 struct FQuakeMdlHeader {
 	friend std::ifstream& operator>>(std::ifstream& stream, FQuakeMdlHeader& hdr) {
-		stream.read((char*)&hdr, sizeof(hdr));
-		return stream;
+		STREAM_READ(hdr.ident);
+		STREAM_READ(hdr.version);
+		stream >> hdr.scale;
+		stream >> hdr.translate;
+		STREAM_READ(hdr.boundingRadius);
+		stream >> hdr.eyePosition;
+		STREAM_READ(hdr.numSkins);
+		STREAM_READ(hdr.skinWidth);
+		STREAM_READ(hdr.skinHeight);
+		STREAM_READ(hdr.numVerts);
+		STREAM_READ(hdr.numTris);
+		STREAM_READ(hdr.numFrames);
+		STREAM_READ(hdr.syncType);
+		STREAM_READ(hdr.flags);
+		STREAM_READ(hdr.size);
+		STREAM_OP_END();
 	}
 
 	int ident = 0;
@@ -54,7 +68,7 @@ struct FQuakeMdlTexCoord {
 struct FQuakeMdlTriangle {
 	friend std::ifstream& operator>>(std::ifstream& stream, FQuakeMdlTriangle& tri) {
 		stream.read((char*)&tri, sizeof(tri));
-		return stream;
+		STREAM_OP_END();
 	}
 
 	int facesFront;
@@ -64,7 +78,7 @@ struct FQuakeMdlTriangle {
 struct FQuakeMdlVertex {
 	friend std::ifstream& operator>>(std::ifstream& stream, FQuakeMdlVertex& vertex) {
 		stream.read((char*)&vertex, sizeof(vertex));
-		return stream;
+		STREAM_OP_END();
 	}
 
 	uint8_t v[3];

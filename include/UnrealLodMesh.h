@@ -10,32 +10,32 @@
 // Additional help from 3ds2unr
 
 struct FUnreal3DHeader {
-	friend std::ofstream& operator<<(std::ofstream& stream, const FUnreal3DHeader& hdr) {
-		stream.write((char*)&hdr.numPolygons, sizeof(hdr.numPolygons));
-		stream.write((char*)&hdr.numVertices, sizeof(hdr.numVertices));
-		stream.write((char*)&hdr.bogusRot, sizeof(hdr.bogusRot));
-		stream.write((char*)&hdr.bogusFrame, sizeof(hdr.bogusFrame));
-		stream.write((char*)&hdr.bogusNormX, sizeof(hdr.bogusNormX));
-		stream.write((char*)&hdr.bogusNormY, sizeof(hdr.bogusNormY));
-		stream.write((char*)&hdr.bogusNormZ, sizeof(hdr.bogusNormZ));
-		stream.write((char*)&hdr.fixScale, sizeof(hdr.fixScale));
-		stream.write((char*)&hdr.unused, sizeof(hdr.unused));
-		stream.write((char*)&hdr.unknown, sizeof(hdr.unknown));
-		return stream;
+	STREAM_WRITE_OP_DECL(FUnreal3DHeader, hdr) {
+		STREAM_WRITE(&hdr.numPolygons);
+		STREAM_WRITE(&hdr.numVertices);
+		STREAM_WRITE(&hdr.bogusRot);
+		STREAM_WRITE(&hdr.bogusFrame);
+		STREAM_WRITE(&hdr.bogusNormX);
+		STREAM_WRITE(&hdr.bogusNormY);
+		STREAM_WRITE(&hdr.bogusNormZ);
+		STREAM_WRITE(&hdr.fixScale);
+		STREAM_WRITE(hdr.unused);
+		STREAM_WRITE(hdr.unknown);
+		STREAM_OP_END();
 	}
 
-	friend std::ifstream& operator>>(std::ifstream& stream, FUnreal3DHeader& hdr) {
-		stream.read((char*)&hdr.numPolygons, sizeof(hdr.numPolygons));
-		stream.read((char*)&hdr.numVertices, sizeof(hdr.numVertices));
-		stream.read((char*)&hdr.bogusRot, sizeof(hdr.bogusRot));
-		stream.read((char*)&hdr.bogusFrame, sizeof(hdr.bogusFrame));
-		stream.read((char*)&hdr.bogusNormX, sizeof(hdr.bogusNormX));
-		stream.read((char*)&hdr.bogusNormY, sizeof(hdr.bogusNormY));
-		stream.read((char*)&hdr.bogusNormZ, sizeof(hdr.bogusNormZ));
-		stream.read((char*)&hdr.fixScale, sizeof(hdr.fixScale));
-		stream.read((char*)&hdr.unused, sizeof(hdr.unused));
-		stream.read((char*)&hdr.unknown, sizeof(hdr.unknown));
-		return stream;
+	STREAM_READ_OP_DECL(FUnreal3DHeader, hdr) {
+		STREAM_READ(&hdr.numPolygons);
+		STREAM_READ(&hdr.numVertices);
+		STREAM_READ(&hdr.bogusRot);
+		STREAM_READ(&hdr.bogusFrame);
+		STREAM_READ(&hdr.bogusNormX);
+		STREAM_READ(&hdr.bogusNormY);
+		STREAM_READ(&hdr.bogusNormZ);
+		STREAM_READ(&hdr.fixScale);
+		STREAM_READ(hdr.unused);
+		STREAM_READ(hdr.unknown);
+		STREAM_OP_END();
 	}
 
 	uint16_t numPolygons;
@@ -51,24 +51,24 @@ struct FUnreal3DHeader {
 };
 
 struct FUnreal3DTri {
-	friend std::ofstream& operator<<(std::ofstream& stream, const FUnreal3DTri& tri) {
-		stream.write((char*)&tri.vertex, sizeof(tri.vertex));
-		stream.write((char*)&tri.type, sizeof(tri.type));
-		stream.write((char*)&tri.color, sizeof(tri.color));
-		stream.write((char*)&tri.uv, sizeof(tri.uv));
-		stream.write((char*)&tri.texNum, sizeof(tri.texNum));
-		stream.write((char*)&tri.flags, sizeof(tri.flags));
-		return stream;
+	STREAM_WRITE_OP_DECL(FUnreal3DTri, tri) {
+		STREAM_WRITE(tri.vertex);
+		STREAM_WRITE(&tri.type);
+		STREAM_WRITE(&tri.color);
+		STREAM_WRITE(tri.uv);
+		STREAM_WRITE(&tri.texNum);
+		STREAM_WRITE(&tri.flags);
+		STREAM_OP_END();
 	}
 
-	friend std::ifstream& operator>>(std::ifstream& stream, FUnreal3DTri& tri) {
-		stream.read((char*)&tri.vertex, sizeof(tri.vertex));
-		stream.read((char*)&tri.type, sizeof(tri.type));
-		stream.read((char*)&tri.color, sizeof(tri.color));
-		stream.read((char*)&tri.uv, sizeof(tri.uv));
-		stream.read((char*)&tri.texNum, sizeof(tri.texNum));
-		stream.read((char*)&tri.flags, sizeof(tri.flags));
-		return stream;
+	STREAM_READ_OP_DECL(FUnreal3DTri, tri) {
+		STREAM_READ(tri.vertex);
+		STREAM_READ(&tri.type);
+		STREAM_READ(&tri.color);
+		STREAM_READ(tri.uv);
+		STREAM_READ(&tri.texNum);
+		STREAM_READ(&tri.flags);
+		STREAM_OP_END();
 	}
 
 	uint16_t vertex[3] = { 0 };

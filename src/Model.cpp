@@ -1,6 +1,7 @@
 #include "common.h"
 #include "idTechMd2.h"
 #include "UnrealLodMesh.h"
+#include "UnrealSkeletalMesh.h"
 
 struct FModelType {
 	char name[8];
@@ -9,9 +10,11 @@ struct FModelType {
 };
 
 FModelType modelTable[] = {
+	{".3d", MDL_U3D, true},
 	{"mdl", MDL_MDL, true},
 	{"md2", MDL_MD2, true},
 	{"md3", MDL_MD3, true},
+	{"psk", MDL_PSK, false},
 };
 
 static FModelType* GetModelType(const char* type) {
@@ -25,8 +28,7 @@ static FModelType* GetModelType(const char* type) {
 	return nullptr;
 }
 
-int ConvertModel(const std::string& assetPath, const std::string& assetExt, const std::string& outputPath) {
-
+int ConvertModel(const std::string& assetPath, const std::string& assetExt, const std::string& outputPath, bool testMode) {
 	int slash = outputPath.find_last_of(DIRECTORY_SEPARATOR);
 	std::string& outputName = outputPath.substr(slash+1);
 	std::string& outputDir = outputPath.substr(0, slash);
@@ -54,8 +56,15 @@ int ConvertModel(const std::string& assetPath, const std::string& assetExt, cons
 		return mesh.Write(outputDir, outputName);
 	}
 	else {
-		// TODO: skeletal meshes
-		std::cout << "Skeletal meshes not yet supported" << std::endl;
+		if (testMode) {
+			if (type->type != MDL_PSK) {
+				std::cout << "Test mode not available for format " << assetExt << std::endl;
+				return -1;
+			}
+
+			FUnrealSkeletalMesh mesh;
+			mesh.Test(assetPath);
+		}
 		return -1;
 	}
 }

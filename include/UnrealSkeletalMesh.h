@@ -213,15 +213,15 @@ struct FUnrealBone {
 	FUnrealJointPos bonePos;
 };
 
-struct FUnrealRawBoneInfluence {
-	STREAM_WRITE_OP_DECL(FUnrealRawBoneInfluence, inf) {
+struct FUnrealBoneWeight {
+	STREAM_WRITE_OP_DECL(FUnrealBoneWeight, inf) {
 		STREAM_WRITE(&inf.weight);
 		STREAM_WRITE(&inf.pointIndex);
 		STREAM_WRITE(&inf.boneIndex);
 		STREAM_OP_END();
 	}
 
-	STREAM_READ_OP_DECL(FUnrealRawBoneInfluence, inf) {
+	STREAM_READ_OP_DECL(FUnrealBoneWeight, inf) {
 		STREAM_READ(&inf.weight);
 		STREAM_READ(&inf.pointIndex);
 		STREAM_READ(&inf.boneIndex);
@@ -315,7 +315,7 @@ public:
 	int AddTriangle(const FUnrealTriangle& t);
 	int AddMaterial(const FUnrealMaterial& m);
 	int AddBone(const FUnrealBone& b);
-	int AddWeight(const FUnrealRawBoneInfluence& i);
+	int AddWeight(const FUnrealBoneWeight& i);
 	int AddAnimation(const FUnrealAnimInfo& a);
 	int AddAnimKey(const FUnrealQuatAnimKey& a);
 
@@ -329,7 +329,7 @@ private:
 	std::vector<FUnrealTriangle> faces;
 	std::vector<FUnrealMaterial> materials;
 	std::vector<FUnrealBone> bones;
-	std::vector<FUnrealRawBoneInfluence> weights;
+	std::vector<FUnrealBoneWeight> weights;
 	std::vector<FUnrealAnimInfo> animations;
 	std::vector<FUnrealQuatAnimKey> animKeys;
 };

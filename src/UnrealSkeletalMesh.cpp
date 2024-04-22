@@ -7,7 +7,7 @@ FUnrealSkeletalMesh::~FUnrealSkeletalMesh() {}
 
 static const char pskActrHead[] = "ACTRHEAD";
 static const char pskPnts0000[] = "PNTS0000";
-static const char pskVtwx0000[] = "VTXW0000";
+static const char pskVtxw0000[] = "VTXW0000";
 static const char pskFace0000[] = "FACE0000";
 static const char pskMatt0000[] = "MATT0000";
 static const char pskRefskelt[] = "REFSKELT";
@@ -101,12 +101,12 @@ int FUnrealSkeletalMesh::Read(const std::string& path) {
 
 	// PSK weights
 	stream >> chunk;
-	if (!chunk.IsValid(pskRawweights, sizeof(FUnrealRawBoneInfluence))) {
+	if (!chunk.IsValid(pskRawweights, sizeof(FUnrealBoneWeight))) {
 		std::cout << "RAWWEIGHTS chunk invalid or missing in " << pskPath << std::endl;
 		return -1;
 	}
 	weights.resize(chunk.dataCount);
-	for (FUnrealRawBoneInfluence& w : weights) {
+	for (FUnrealBoneWeight& w : weights) {
 		stream >> w;
 	}
 
@@ -183,6 +183,7 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 
 	std::ofstream stream;
 
+	// Write PSK file
 	stream.open(pskPath, std::ofstream::out | std::istream::binary);
 	if (!stream.is_open()) {
 		std::cout << "Failed to open " << pskPath << std::endl;
@@ -197,7 +198,7 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 	chunk.flags = UNREAL_SKEL_CHUNK_FLAGS;
 
 	strncpy(chunk.id, pskPnts0000, sizeof(pskPnts0000));
-	chunk.dataSize = sizeof(FUnrealVertex);
+	chunk.dataSize = sizeof(FVec3f);
 	chunk.dataCount = points.size();
 
 	stream << chunk;
@@ -205,6 +206,95 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 		stream << p;
 	}
 
+	strncpy(chunk.id, pskVtxw0000, sizeof(pskVtxw0000));
+	chunk.dataSize = sizeof(FUnrealVertex);
+	chunk.dataCount = vertices.size();
+
+	stream << chunk;
+	for (FUnrealVertex& v : vertices) {
+		stream << v;
+	}
+
+	strncpy(chunk.id, pskFace0000, sizeof(pskFace0000));
+	chunk.dataSize = sizeof(FUnrealTriangle);
+	chunk.dataCount = faces.size();
+
+	stream << chunk;
+	for (FUnrealTriangle& f : faces) {
+		stream << f;
+	}
+
+	strncpy(chunk.id, pskMatt0000, sizeof(pskMatt0000));
+	chunk.dataSize = sizeof(FUnrealMaterial);
+	chunk.dataCount = materials.size();
+
+	stream << chunk;
+	for (FUnrealMaterial& m : materials) {
+		stream << m;
+	}
+
+	strncpy(chunk.id, pskRefskelt, sizeof(pskRefskelt));
+	chunk.dataSize = sizeof(FUnrealBone);
+	chunk.dataCount = bones.size();
+
+	stream << chunk;
+	for (FUnrealBone& b : bones) {
+		stream << b;
+	}
+
+	strncpy(chunk.id, pskRawweights, sizeof(pskRawweights));
+	chunk.dataSize = sizeof(FUnrealBoneWeight);
+	chunk.dataCount = weights.size();
+
+	stream << chunk;
+	for (FUnrealBoneWeight& w : weights) {
+		stream << w;
+	}
+
+	stream.close();
+
+	// Write PSA file
+	stream.open(psaPath, std::ofstream::out | std::istream::binary);
+	if (!stream.is_open()) {
+		std::cout << "Failed to open " << psaPath << std::endl;
+		return -1;
+	}
+
+	strncpy(psaHeader.id, psaAnimHead, sizeof(psaAnimHead));
+	psaHeader.flags = UNREAL_SKEL_CHUNK_FLAGS;
+	stream << psaHeader;
+
+	strncpy(chunk.id, psaBoneNames, sizeof(psaBoneNames));
+	chunk.dataSize = sizeof(FUnrealBone);
+	chunk.dataCount = bones.size();
+
+	stream << chunk;
+	for (FUnrealBone& b : bones) {
+		stream << b;
+	}
+
+	strncpy(chunk.id, psaAnimInfo, sizeof(psaAnimInfo));
+	chunk.dataSize = sizeof(FUnrealAnimInfo);
+	chunk.dataCount = animations.size();
+
+	stream << chunk;
+	for (FUnrealAnimInfo& a : animations) {
+		stream << a;
+	}
+
+	strncpy(chunk.id, psaAnimKeys, sizeof(psaAnimKeys));
+	chunk.dataSize = sizeof(FUnrealQuatAnimKey);
+	chunk.dataCount = animKeys.size();
+
+	stream << chunk;
+	for (FUnrealQuatAnimKey& k : animKeys) {
+		stream << k;
+	}
+
+	stream.close();
+
+	// TODO: write UC file
+	// TODO: FUnrealScriptFile, use in FUnrealLodMesh
 }
 
 int FUnrealSkeletalMesh::Test(const std::string& path) {
@@ -259,7 +349,7 @@ int FUnrealSkeletalMesh::AddBone(const FUnrealBone& b) {
 	return i;
 }
 
-int FUnrealSkeletalMesh::AddWeight(const FUnrealRawBoneInfluence& i) {
+int FUnrealSkeletalMesh::AddWeight(const FUnrealBoneWeight& i) {
 	weights.push_back(i);
 }
 

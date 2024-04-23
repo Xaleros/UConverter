@@ -63,8 +63,11 @@ int ConvertModel(const std::string& assetPath, const std::string& assetExt, cons
 			}
 
 			FUnrealSkeletalMesh mesh;
-			mesh.Test(assetPath);
+			if (mesh.Test(assetPath) < 0) {
+				std::cout << "Skeletal Test failed" << std::endl;
+				return -1;
+			}
 		}
-		return -1;
+		return 0;
 	}
 }

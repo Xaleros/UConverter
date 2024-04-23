@@ -9,9 +9,12 @@ struct FAssetType {
 };
 
 FAssetType typeTable[] = {
+	{"3d",  AST_MODEL, "Unreal LodMesh"},
 	{"mdl", AST_MODEL, "idTech 1 (Quake) Model"},
 	{"md2", AST_MODEL, "idTech 2 (Quake 2) Model"},
 	{"md3", AST_MODEL, "idTech3 Model"},
+	{"psk", AST_MODEL, "Unreal Skeletal Mesh"},
+	{"psa", AST_MODEL, "Unreal Skeletal Mesh"}
 };
 
 #ifndef _WIN32
@@ -112,8 +115,13 @@ int main(int argc, char** argv) {
 		return Error("Required argument [-i <input path>] missing");
 	}
 
+	NormalizeDirectoryString(assetPath);
+
 	if (outputPath.size() == 0 && !testMode) {
 		return Error("Required argument [-o <output path>] missing");
+	}
+	else {
+		NormalizeDirectoryString(outputPath);
 	}
 
 	// Check file extension
@@ -129,8 +137,6 @@ int main(int argc, char** argv) {
 
 	int rc = 0;
 
-	NormalizeDirectoryString(assetPath);
-	NormalizeDirectoryString(outputPath);
 
 	switch (assetType) {
 	case AST_MODEL:

@@ -307,7 +307,21 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 }
 
 int FUnrealSkeletalMesh::Test(const std::string& path) {
-	return -1;
+	if (Read(path) < 0) {
+		std::cout << "SkeletalMesh read test failed" << std::endl;
+		return -1;
+	}
+
+	size_t slash = path.find_last_of('\\');
+	std::string outputPath = path.substr(0, slash + 1);
+	std::string modelName = path.substr(slash + 1, path.find_last_of('.')) + "_TestOutput";
+
+	if (Write(outputPath, modelName) < 0) {
+		std::cout << "SkeletalMesh write test failed" << std::endl;
+		return -1;
+	}
+
+	return 0;
 }
 
 int FUnrealSkeletalMesh::AddPoint(const FVec3f& p) {

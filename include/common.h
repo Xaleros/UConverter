@@ -49,6 +49,13 @@ enum EModelType {
 //////////////////////////////////////////////////////////////////////////
 
 struct FVec3f {
+	FVec3f() {}
+	FVec3f(float x, float y, float z) {
+		v[0] = x;
+		v[1] = y;
+		v[2] = z;
+	}
+
 	STREAM_WRITE_OP_DECL(FVec3f, vec) {
 		STREAM_WRITE(vec.v);
 		STREAM_OP_END();

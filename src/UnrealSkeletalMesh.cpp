@@ -183,7 +183,10 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 
 	std::ofstream stream;
 
+	/////////////////////////////////////////////////////////
 	// Write PSK file
+	/////////////////////////////////////////////////////////
+
 	stream.open(pskPath, std::ofstream::out | std::istream::binary);
 	if (!stream.is_open()) {
 		std::cout << "Failed to open " << pskPath << std::endl;
@@ -253,7 +256,10 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 
 	stream.close();
 
+	/////////////////////////////////////////////////////////
 	// Write PSA file
+	/////////////////////////////////////////////////////////
+
 	stream.open(psaPath, std::ofstream::out | std::istream::binary);
 	if (!stream.is_open()) {
 		std::cout << "Failed to open " << psaPath << std::endl;
@@ -293,8 +299,10 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 
 	stream.close();
 
+	/////////////////////////////////////////////////////////
 	// TODO: write UC file
-	// TODO: FUnrealScriptFile, use in FUnrealLodMesh
+	/////////////////////////////////////////////////////////
+
 	return 0;
 }
 

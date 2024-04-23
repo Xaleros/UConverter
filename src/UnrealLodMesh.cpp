@@ -1,5 +1,6 @@
 #include <fstream>
 #include "UnrealLodMesh.h"
+#include "UnrealScriptFile.h"
 
 FUnreal3DSeq::FUnreal3DSeq()
 	: name(""), length(0)
@@ -60,6 +61,10 @@ int FUnrealLodMesh::Write(std::string& outputPath, std::string& modelName) {
 		return -1;
 	}
 
+	/////////////////////////////////////////////////////////
+	// Write data file
+	/////////////////////////////////////////////////////////
+
 	std::ofstream stream;
 
 	stream.open(datapath, std::ofstream::out | std::istream::binary);
@@ -78,6 +83,10 @@ int FUnrealLodMesh::Write(std::string& outputPath, std::string& modelName) {
 
 	stream.close();
 
+	/////////////////////////////////////////////////////////
+	// Write aniv file
+	/////////////////////////////////////////////////////////
+
 	stream.open(anivpath, std::ofstream::out | std::istream::binary);
 	if (!stream.is_open()) {
 		std::cout << "Failed to open " << anivpath << std::endl;
@@ -94,54 +103,43 @@ int FUnrealLodMesh::Write(std::string& outputPath, std::string& modelName) {
 
 	stream.close();
 
-	std::string comment = "//" + std::string(77, '=') + "\n";
-	std::string seqstr = "#exec MESH SEQUENCE MESH=" + modelName + " SEQ=";
+	/////////////////////////////////////////////////////////
+	// Write UC file
+	/////////////////////////////////////////////////////////
 
-	stream.open(ucpath, std::ofstream::out);
-	if (!stream.is_open()) {
-		std::cout << "Failed to open " << ucpath << std::endl;
-		return -1;
-	}
-
-	stream << comment;
-	stream << "// " + modelName + ".\n";
-	stream << comment;
-	stream << "class " + modelName + "expands Actor;\n\n";
-	stream << "#exec MESH IMPORT MESH=" + modelName + " ANIVFILE=" + anivfile + " DATAFILE=" + datafile + " MLOD=0\n";
-	stream << "#exec MESH ORIGIN MESH=" + modelName + " X=0 Y=0 Z=0 YAW=128\n\n";
-
-	stream << seqstr + "All STARTFRAME=0 NUMFRAMES=" + std::to_string(numFrames) + "\n";
+	FUnrealScriptFile script(modelName);
+	script.AddMeshImport(anivfile, datafile);
+	script.AddAnimSequence("All", 0, numFrames);
 
 	int startFrame = 0;
 	for (FUnreal3DSeq seq : sequences) {
-		stream << seqstr + seq.name + " STARTFRAME=" + std::to_string(startFrame) + " NUMFRAMES=" + std::to_string(seq.length) + "\n";
+		script.AddAnimSequence(seq.name, startFrame, seq.length);
+		startFrame += seq.length;
 	}
 
-	stream << "\n";
+	script.AddNewLine();
 
 	if (textures.size() > 0) {
 		for (int i = 0; i < textures.size(); i++) {
 			std::string texname = modelName + std::to_string(i);
-			stream << "#exec TEXTURE IMPORT NAME=" + texname + " FILE=Models\\" + texname + ".bmp GROUP=Skins";
+			script.AddTexture(texname, "Models\\" + texname + ".bmp");
 		}
-		stream << "\n";
+		script.AddNewLine();
 	}
 
-	stream << "#exec MESHMAP NEW MESHMAP=" + modelName + " MESH=" + modelName + "\n";
-	stream << "#exec MESHMAP SCALE MESHMAP=" + modelName + " X=-0.1875 Y=-0.1875 Z=0.375\n\n";
+	script.AddMeshmap(FVec3f(-0.1875f, -0.1875f, 0.375f));
 
 	if (textures.size() > 0) {
 		for (int i = 0; i < textures.size(); i++) {
 			std::string texname = modelName + std::to_string(i);
-			stream << "#exec MESHMAP SETTEXTURE MESHMAP=" + modelName + " NUM=" + std::to_string(i) + " TEXTURE=" + texname + "\n";
+			script.SetMeshmapTexture(texname, i);
 		}
 	}
 
-	stream << "\ndefaultproperties\n{\n";
-	stream << "\tDrawType=DT_Mesh\n";
-	stream << "\tMesh=" + modelName + "\n";
-	stream << "}\n";
+	int rc = script.Write(ucpath);
+	if (rc < 0) {
+		std::cout << "Failed to write script to " + ucpath << std::endl;
+	}
 
-	stream.close();
-	return 0;
+	return rc;
 }

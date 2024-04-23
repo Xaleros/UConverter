@@ -5,10 +5,12 @@ project(UConverter)
 set(UCONVERTER_SOURCES
 	include/Common.h
 	include/UnrealLodMesh.h
+	include/UnrealScriptFile.h
 	include/UnrealSkeletalMesh.h
 	include/idTechMdl.h
 	include/idTechMd2.h
 	src/UnrealLodMesh.cpp
+	src/UnrealScriptFile.cpp
 	src/UnrealSkeletalMesh.cpp
 	src/idTechMdl.cpp
 	src/idTechmd2.cpp

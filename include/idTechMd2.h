@@ -11,23 +11,23 @@
 
 struct FMD2Header {
 	STREAM_READ_OP_DECL(FMD2Header, hdr) {
-		STREAM_READ(&hdr.ident);
-		STREAM_READ(&hdr.version);
-		STREAM_READ(&hdr.skinWidth);
-		STREAM_READ(&hdr.skinHeight);
-		STREAM_READ(&hdr.frameSize);
-		STREAM_READ(&hdr.numSkins);
-		STREAM_READ(&hdr.numVertices);
-		STREAM_READ(&hdr.numSt);
-		STREAM_READ(&hdr.numTris);
-		STREAM_READ(&hdr.numGlCmds);
-		STREAM_READ(&hdr.numFrames);
-		STREAM_READ(&hdr.offsetSkins);
-		STREAM_READ(&hdr.offsetSt);
-		STREAM_READ(&hdr.offsetTris);
-		STREAM_READ(&hdr.offsetFrames);
-		STREAM_READ(&hdr.offsetGlCmds);
-		STREAM_READ(&hdr.offsetEnd);
+		STREAM_READ(hdr.ident);
+		STREAM_READ(hdr.version);
+		STREAM_READ(hdr.skinWidth);
+		STREAM_READ(hdr.skinHeight);
+		STREAM_READ(hdr.frameSize);
+		STREAM_READ(hdr.numSkins);
+		STREAM_READ(hdr.numVertices);
+		STREAM_READ(hdr.numSt);
+		STREAM_READ(hdr.numTris);
+		STREAM_READ(hdr.numGlCmds);
+		STREAM_READ(hdr.numFrames);
+		STREAM_READ(hdr.offsetSkins);
+		STREAM_READ(hdr.offsetSt);
+		STREAM_READ(hdr.offsetTris);
+		STREAM_READ(hdr.offsetFrames);
+		STREAM_READ(hdr.offsetGlCmds);
+		STREAM_READ(hdr.offsetEnd);
 		STREAM_OP_END();
 	}
 
@@ -56,7 +56,7 @@ struct FMD2Header {
 
 struct FMD2Skin {
 	STREAM_READ_OP_DECL(FMD2Skin, skin) {
-		STREAM_READ(skin.name);
+		STREAM_READ_BUF(skin.name);
 		STREAM_OP_END();
 	}
 
@@ -65,8 +65,8 @@ struct FMD2Skin {
 
 struct FMD2TexCoord {
 	STREAM_READ_OP_DECL(FMD2TexCoord, texcoord) {
-		STREAM_READ(&texcoord.s);
-		STREAM_READ(&texcoord.t);
+		STREAM_READ(texcoord.s);
+		STREAM_READ(texcoord.t);
 		STREAM_OP_END();
 	}
 
@@ -76,8 +76,8 @@ struct FMD2TexCoord {
 
 struct FMD2Triangle {
 	STREAM_READ_OP_DECL(FMD2Triangle, tri) {
-		STREAM_READ(&tri.v);
-		STREAM_READ(&tri.st);
+		STREAM_READ(tri.v);
+		STREAM_READ(tri.st);
 		STREAM_OP_END();
 	}
 
@@ -87,8 +87,8 @@ struct FMD2Triangle {
 
 struct FMD2Vertex {
 	STREAM_READ_OP_DECL(FMD2Vertex, vertex) {
-		STREAM_READ(vertex.v);
-		STREAM_READ(&vertex.normalIndex);
+		STREAM_READ_BUF(vertex.v);
+		STREAM_READ(vertex.normalIndex);
 		STREAM_OP_END();
 	}
 
@@ -100,7 +100,7 @@ struct FMD2Frame {
 	STREAM_READ_OP_DECL(FMD2Frame, frame) {
 		stream >> frame.scale;
 		stream >> frame.translate;
-		STREAM_READ(frame.name);
+		STREAM_READ_BUF(frame.name);
 		for (FMD2Vertex& v : frame.verts) {
 			stream >> v;
 		}

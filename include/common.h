@@ -21,9 +21,15 @@
 	friend std::ofstream& operator<<(std::ofstream& stream, const t& n)
 
 #define STREAM_READ(m) \
+	stream.read(reinterpret_cast<char*>(&m), sizeof(m))
+
+#define STREAM_READ_BUF(m) \
 	stream.read(reinterpret_cast<char*>(m), sizeof(m))
 
 #define STREAM_WRITE(m) \
+	stream.write(reinterpret_cast<const char*>(&m), sizeof(m))
+
+#define STREAM_WRITE_BUF(m) \
 	stream.write(reinterpret_cast<const char*>(m), sizeof(m))
 
 #define STREAM_OP_END() \

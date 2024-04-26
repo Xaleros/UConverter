@@ -12,18 +12,18 @@
 
 struct FUnrealSkelChunk {
 	STREAM_WRITE_OP_DECL(FUnrealSkelChunk, chunk) {
-		STREAM_WRITE(chunk.id);
-		STREAM_WRITE(&chunk.flags);
-		STREAM_WRITE(&chunk.dataSize);
-		STREAM_WRITE(&chunk.dataCount);
+		STREAM_WRITE_BUF(chunk.id);
+		STREAM_WRITE(chunk.flags);
+		STREAM_WRITE(chunk.dataSize);
+		STREAM_WRITE(chunk.dataCount);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealSkelChunk, chunk) {
-		STREAM_READ(chunk.id);
-		STREAM_READ(&chunk.flags);
-		STREAM_READ(&chunk.dataSize);
-		STREAM_READ(&chunk.dataCount);
+		STREAM_READ_BUF(chunk.id);
+		STREAM_READ(chunk.flags);
+		STREAM_READ(chunk.dataSize);
+		STREAM_READ(chunk.dataCount);
 		STREAM_OP_END();
 	}
 
@@ -46,22 +46,22 @@ struct FUnrealSkelChunk {
 // PSK data types
 struct FUnrealVertex {
 	STREAM_WRITE_OP_DECL(FUnrealVertex, vert) {
-		STREAM_WRITE(&vert.pointIndex);
-		STREAM_WRITE(&vert.reserved0);
-		STREAM_WRITE(&vert.u);
-		STREAM_WRITE(&vert.v);
-		STREAM_WRITE(&vert.matIndex);
-		STREAM_WRITE(vert.reserved1);
+		STREAM_WRITE(vert.pointIndex);
+		STREAM_WRITE(vert.reserved0);
+		STREAM_WRITE(vert.u);
+		STREAM_WRITE(vert.v);
+		STREAM_WRITE(vert.matIndex);
+		STREAM_WRITE_BUF(vert.reserved1);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealVertex, vert) {
-		STREAM_READ(&vert.pointIndex);
-		STREAM_READ(&vert.reserved0);
-		STREAM_READ(&vert.u);
-		STREAM_READ(&vert.v);
-		STREAM_READ(&vert.matIndex);
-		STREAM_READ(vert.reserved1);
+		STREAM_READ(vert.pointIndex);
+		STREAM_READ(vert.reserved0);
+		STREAM_READ(vert.u);
+		STREAM_READ(vert.v);
+		STREAM_READ(vert.matIndex);
+		STREAM_READ_BUF(vert.reserved1);
 		STREAM_OP_END();
 	}
 
@@ -82,18 +82,18 @@ struct FUnrealVertex {
 
 struct FUnrealTriangle {
 	STREAM_WRITE_OP_DECL(FUnrealTriangle, tri) {
-		STREAM_WRITE(tri.wedgeIndex);
-		STREAM_WRITE(&tri.matIndex);
-		STREAM_WRITE(&tri.auxMatIndex);
-		STREAM_WRITE(&tri.smoothingGroups);
+		STREAM_WRITE_BUF(tri.wedgeIndex);
+		STREAM_WRITE(tri.matIndex);
+		STREAM_WRITE(tri.auxMatIndex);
+		STREAM_WRITE(tri.smoothingGroups);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealTriangle, tri) {
-		STREAM_READ(tri.wedgeIndex);
-		STREAM_READ(&tri.matIndex);
-		STREAM_READ(&tri.auxMatIndex);
-		STREAM_READ(&tri.smoothingGroups);
+		STREAM_READ_BUF(tri.wedgeIndex);
+		STREAM_READ(tri.matIndex);
+		STREAM_READ(tri.auxMatIndex);
+		STREAM_READ(tri.smoothingGroups);
 		STREAM_OP_END();
 	}
 
@@ -105,24 +105,24 @@ struct FUnrealTriangle {
 
 struct FUnrealMaterial {
 	STREAM_WRITE_OP_DECL(FUnrealMaterial, mat) {
-		STREAM_WRITE(mat.name);
-		STREAM_WRITE(&mat.textureIndex);
-		STREAM_WRITE(&mat.polyFlags);
-		STREAM_WRITE(&mat.auxMaterial);
-		STREAM_WRITE(&mat.auxFlags);
-		STREAM_WRITE(&mat.lodBias);
-		STREAM_WRITE(&mat.lodStyle);
+		STREAM_WRITE_BUF(mat.name);
+		STREAM_WRITE(mat.textureIndex);
+		STREAM_WRITE(mat.polyFlags);
+		STREAM_WRITE(mat.auxMaterial);
+		STREAM_WRITE(mat.auxFlags);
+		STREAM_WRITE(mat.lodBias);
+		STREAM_WRITE(mat.lodStyle);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealMaterial, mat) {
-		STREAM_READ(mat.name);
-		STREAM_READ(&mat.textureIndex);
-		STREAM_READ(&mat.polyFlags);
-		STREAM_READ(&mat.auxMaterial);
-		STREAM_READ(&mat.auxFlags);
-		STREAM_READ(&mat.lodBias);
-		STREAM_READ(&mat.lodStyle);
+		STREAM_READ_BUF(mat.name);
+		STREAM_READ(mat.textureIndex);
+		STREAM_READ(mat.polyFlags);
+		STREAM_READ(mat.auxMaterial);
+		STREAM_READ(mat.auxFlags);
+		STREAM_READ(mat.lodBias);
+		STREAM_READ(mat.lodStyle);
 		STREAM_OP_END();
 	}
 
@@ -149,7 +149,7 @@ struct FUnrealJointPos {
 	STREAM_WRITE_OP_DECL(FUnrealJointPos, j) {
 		stream << j.orientation;
 		stream << j.position;
-		STREAM_WRITE(&j.length);
+		STREAM_WRITE(j.length);
 		stream << j.size;
 		STREAM_OP_END();
 	}
@@ -157,7 +157,7 @@ struct FUnrealJointPos {
 	STREAM_READ_OP_DECL(FUnrealJointPos, j) {
 		stream >> j.orientation;
 		stream >> j.position;
-		STREAM_READ(&j.length);
+		STREAM_READ(j.length);
 		stream >> j.size;
 		STREAM_OP_END();
 	}
@@ -177,19 +177,19 @@ struct FUnrealJointPos {
 
 struct FUnrealBone {
 	STREAM_WRITE_OP_DECL(FUnrealBone, bone) {
-		STREAM_WRITE(bone.name);
-		STREAM_WRITE(&bone.boneFlags);
-		STREAM_WRITE(&bone.numChildren);
-		STREAM_WRITE(&bone.parentIndex);
+		STREAM_WRITE_BUF(bone.name);
+		STREAM_WRITE(bone.boneFlags);
+		STREAM_WRITE(bone.numChildren);
+		STREAM_WRITE(bone.parentIndex);
 		stream << bone.bonePos;
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealBone, bone) {
-		STREAM_READ(bone.name);
-		STREAM_READ(&bone.boneFlags);
-		STREAM_READ(&bone.numChildren);
-		STREAM_READ(&bone.parentIndex);
+		STREAM_READ_BUF(bone.name);
+		STREAM_READ(bone.boneFlags);
+		STREAM_READ(bone.numChildren);
+		STREAM_READ(bone.parentIndex);
 		stream >> bone.bonePos;
 		STREAM_OP_END();
 	}
@@ -198,8 +198,9 @@ struct FUnrealBone {
 		return (a.boneFlags == b.boneFlags) &&
 			(a.numChildren == b.numChildren) &&
 			(a.parentIndex == b.parentIndex) &&
-			(strncmp(a.name, b.name, sizeof(a.name)) == 0) &&
-			(a.bonePos == b.bonePos);
+			(strncmp(a.name, b.name, sizeof(a.name)) == 0);
+			// psa/psk bone data is always slightly off, what stupid BS
+			//&& (a.bonePos == b.bonePos);
 	}
 
 	friend bool operator!=(const FUnrealBone& a, const FUnrealBone& b) {
@@ -215,16 +216,16 @@ struct FUnrealBone {
 
 struct FUnrealBoneWeight {
 	STREAM_WRITE_OP_DECL(FUnrealBoneWeight, inf) {
-		STREAM_WRITE(&inf.weight);
-		STREAM_WRITE(&inf.pointIndex);
-		STREAM_WRITE(&inf.boneIndex);
+		STREAM_WRITE(inf.weight);
+		STREAM_WRITE(inf.pointIndex);
+		STREAM_WRITE(inf.boneIndex);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealBoneWeight, inf) {
-		STREAM_READ(&inf.weight);
-		STREAM_READ(&inf.pointIndex);
-		STREAM_READ(&inf.boneIndex);
+		STREAM_READ(inf.weight);
+		STREAM_READ(inf.pointIndex);
+		STREAM_READ(inf.boneIndex);
 		STREAM_OP_END();
 	}
 
@@ -236,34 +237,34 @@ struct FUnrealBoneWeight {
 // PSA data types
 struct FUnrealAnimInfo {
 	STREAM_WRITE_OP_DECL(FUnrealAnimInfo, anim) {
-		STREAM_WRITE(anim.name);
-		STREAM_WRITE(anim.group);
-		STREAM_WRITE(&anim.totalBones);
-		STREAM_WRITE(&anim.rootInclude);
-		STREAM_WRITE(&anim.keyCompressionStyle);
-		STREAM_WRITE(&anim.keyQuotum);
-		STREAM_WRITE(&anim.keyReduction);
-		STREAM_WRITE(&anim.trackTime);
-		STREAM_WRITE(&anim.animRate);
-		STREAM_WRITE(&anim.startBone);
-		STREAM_WRITE(&anim.firstRawFrame);
-		STREAM_WRITE(&anim.numRawFrames);
+		STREAM_WRITE_BUF(anim.name);
+		STREAM_WRITE_BUF(anim.group);
+		STREAM_WRITE(anim.totalBones);
+		STREAM_WRITE(anim.rootInclude);
+		STREAM_WRITE(anim.keyCompressionStyle);
+		STREAM_WRITE(anim.keyQuotum);
+		STREAM_WRITE(anim.keyReduction);
+		STREAM_WRITE(anim.trackTime);
+		STREAM_WRITE(anim.animRate);
+		STREAM_WRITE(anim.startBone);
+		STREAM_WRITE(anim.firstRawFrame);
+		STREAM_WRITE(anim.numRawFrames);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealAnimInfo, anim) {
-		STREAM_READ(anim.name);
-		STREAM_READ(anim.group);
-		STREAM_READ(&anim.totalBones);
-		STREAM_READ(&anim.rootInclude);
-		STREAM_READ(&anim.keyCompressionStyle);
-		STREAM_READ(&anim.keyQuotum);
-		STREAM_READ(&anim.keyReduction);
-		STREAM_READ(&anim.trackTime);
-		STREAM_READ(&anim.animRate);
-		STREAM_READ(&anim.startBone);
-		STREAM_READ(&anim.firstRawFrame);
-		STREAM_READ(&anim.numRawFrames);
+		STREAM_READ_BUF(anim.name);
+		STREAM_READ_BUF(anim.group);
+		STREAM_READ(anim.totalBones);
+		STREAM_READ(anim.rootInclude);
+		STREAM_READ(anim.keyCompressionStyle);
+		STREAM_READ(anim.keyQuotum);
+		STREAM_READ(anim.keyReduction);
+		STREAM_READ(anim.trackTime);
+		STREAM_READ(anim.animRate);
+		STREAM_READ(anim.startBone);
+		STREAM_READ(anim.firstRawFrame);
+		STREAM_READ(anim.numRawFrames);
 		STREAM_OP_END();
 	}
 
@@ -285,14 +286,14 @@ struct FUnrealQuatAnimKey {
 	STREAM_WRITE_OP_DECL(FUnrealQuatAnimKey, key) {
 		stream << key.position;
 		stream << key.orientation;
-		STREAM_WRITE(&key.time);
+		STREAM_WRITE(key.time);
 		STREAM_OP_END();
 	}
 
 	STREAM_READ_OP_DECL(FUnrealQuatAnimKey, key) {
 		stream >> key.position;
 		stream >> key.orientation;
-		STREAM_READ(&key.time);
+		STREAM_READ(key.time);
 		STREAM_OP_END();
 	}
 

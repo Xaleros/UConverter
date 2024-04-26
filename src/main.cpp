@@ -65,8 +65,8 @@ static void PrintHelp() {
 	std::cout << "\t-T <path>" << std::endl;
 }
 
-static int Error(const char* msg) {
-	std::cout << msg << std::endl;
+static int Error(const char* msg, int help = 0) {
+	std::cout << msg << std::endl << std::endl;
 	PrintHelp();
 	return -1;
 }
@@ -112,13 +112,13 @@ int main(int argc, char** argv) {
 	}
 
 	if (assetPath.size() == 0) {
-		return Error("Required argument [-i <input path>] missing");
+		return Error("Required argument [-i <input path>] missing", 1);
 	}
 
 	NormalizeDirectoryString(assetPath);
 
 	if (outputPath.size() == 0 && !testMode) {
-		return Error("Required argument [-o <output path>] missing");
+		return Error("Required argument [-o <output path>] missing", 1);
 	}
 	else {
 		NormalizeDirectoryString(outputPath);
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
 	if (assetType == AST_NONE) {
 		assetExt = GetFileExt(assetPath);
 		if (assetExt.size() == 0) {
-			return Error("No file extension - please specify [-t <asset type>]");
+			return Error("No file extension - please specify [-t <asset type>]", 1);
 		}
 		assetType = GetAssetType(assetExt.c_str());
 	}

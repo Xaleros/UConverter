@@ -36,6 +36,7 @@ int FUnrealSkeletalMesh::Read(const std::string& path) {
 	}
 
 	stream >> pskHeader;
+	size_t pos = stream.tellg();
 	
 	if (!pskHeader.IsValid(pskActrHead, 0)) {
 		std::cout << "ACTRHEAD chunk invalid or missing in " << pskPath << std::endl;
@@ -54,7 +55,7 @@ int FUnrealSkeletalMesh::Read(const std::string& path) {
 	for (FVec3f& p : points) {
 		stream >> p;
 	}
-
+	
 	// PSK vertices
 	stream >> chunk;
 	if (!chunk.IsValid(pskVtxw0000, sizeof(FUnrealVertex))) {
@@ -142,7 +143,7 @@ int FUnrealSkeletalMesh::Read(const std::string& path) {
 		FUnrealBone psaBone;
 		stream >> psaBone;
 		if (b != psaBone) {
-			std::cout << "Bone " << b.name << " mismatch in " << psaPath << std::endl;
+			std::cout << "Bone name mismatch in " << psaPath << ": expected " << b.name << " got " << psaBone.name << std::endl;
 			return -1;
 		}
 	}
@@ -160,7 +161,7 @@ int FUnrealSkeletalMesh::Read(const std::string& path) {
 
 	// PSA anim keys
 	stream >> chunk;
-	if (!chunk.IsValid(psaAnimKeys, sizeof(FUnrealAnimInfo))) {
+	if (!chunk.IsValid(psaAnimKeys, sizeof(FUnrealQuatAnimKey))) {
 		std::cout << "ANIMKEYS chunk invalid or missing in " << psaPath << std::endl;
 		return -1;
 	}
@@ -313,8 +314,8 @@ int FUnrealSkeletalMesh::Test(const std::string& path) {
 	}
 
 	size_t slash = path.find_last_of('\\');
-	std::string outputPath = path.substr(0, slash + 1);
-	std::string modelName = path.substr(slash + 1, path.find_last_of('.')) + "_TestOutput";
+	std::string outputPath = path.substr(0, slash);
+	std::string modelName = path.substr(slash + 1, path.find_last_of('.') - slash - 1) + "_TestOutput";
 
 	if (Write(outputPath, modelName) < 0) {
 		std::cout << "SkeletalMesh write test failed" << std::endl;
@@ -396,10 +397,10 @@ void FUnrealSkeletalMesh::GetPskPsaPaths(const std::string& path, std::string& p
 	std::string ext = GetFileExt(path);
 	if (ext.compare("psk") == 0) {
 		pskPath.assign(path);
-		psaPath.assign(pskPath.substr(path.find_last_of('.')) + "psa");
+		psaPath.assign(pskPath.substr(0, path.find_last_of('.')+1) + "psa");
 	}
 	else if (ext.compare("psa") == 0) {
-		pskPath.assign(pskPath.substr(path.find_last_of('.')) + "psk");
+		pskPath.assign(pskPath.substr(0, path.find_last_of('.')+1) + "psk");
 		psaPath.assign(path);
 	}
 	else {

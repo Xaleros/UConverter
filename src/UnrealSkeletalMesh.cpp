@@ -1,5 +1,6 @@
 #pragma once
 
+#include "UnrealScriptFile.h"
 #include "UnrealSkeletalMesh.h"
 
 FUnrealSkeletalMesh::FUnrealSkeletalMesh() {}
@@ -301,8 +302,24 @@ int FUnrealSkeletalMesh::Write(const std::string& outputPath, const std::string&
 	stream.close();
 
 	/////////////////////////////////////////////////////////
-	// TODO: write UC file
+	// Write UC file
 	/////////////////////////////////////////////////////////
+	std::string psaName = modelName + "_Anim";
+
+	FUnrealScriptFile script(modelName);
+	script.AddModelImport(pskFile);
+	script.AddAnimImport(psaName, psaFile);
+	script.AddMeshmapScale(FVec3f(1.0, 1.0, 1.0));
+	script.AddNewLine();
+
+	for (FUnrealAnimInfo& anim : animations) {
+		script.AddAnimSequence(anim.name, anim.firstRawFrame, anim.numRawFrames, anim.trackTime);
+	}
+
+	script.AddNewLine();
+	script.AddAnimDigest();
+	script.SetMeshDefaultAnim();
+	script.Write(ucPath);
 
 	return 0;
 }

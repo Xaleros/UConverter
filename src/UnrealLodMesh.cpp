@@ -110,6 +110,7 @@ int FUnrealLodMesh::Write(std::string& outputPath, std::string& modelName) {
 	FUnrealScriptFile script(modelName);
 	script.AddMeshImport(anivfile, datafile);
 	script.AddAnimSequence("All", 0, numFrames);
+	script.AddNewLine();
 
 	int startFrame = 0;
 	for (FUnreal3DSeq seq : sequences) {
@@ -127,7 +128,8 @@ int FUnrealLodMesh::Write(std::string& outputPath, std::string& modelName) {
 		script.AddNewLine();
 	}
 
-	script.AddMeshmap(FVec3f(-0.1875f, -0.1875f, 0.375f));
+	script.AddMeshmap();
+	script.AddMeshmapScale(FVec3f(-0.1875f, -0.1875f, 0.375f));
 
 	if (textures.size() > 0) {
 		for (int i = 0; i < textures.size(); i++) {

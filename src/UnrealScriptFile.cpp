@@ -21,20 +21,46 @@ void FUnrealScriptFile::AddNewLine() {
 
 void FUnrealScriptFile::AddMeshImport(const std::string& anivPath, const std::string& dataPath) {
 	buf += "#exec MESH IMPORT MESH=" + name + " ANIVFILE=" + anivPath + " DATAFILE=" + dataPath + " MLOD=0\n";
-	buf += "#exec MESH ORIGIN MESH=" + name + " X=0 Y=0 Z=0 YAW=128\n\n";
+	buf += "#exec MESH ORIGIN MESH=" + name + " X=0 Y=0 Z=0 YAW=128 PITCH=0 ROLL=0\n";
 }
 
-void FUnrealScriptFile::AddAnimSequence(const std::string& seqName, uint32_t startFrame, uint32_t numFrames) {
-	buf += "#exec MESH SEQUENCE MESH=" + name + " SEQ=" + seqName + " STARTFRAME=" + std::to_string(startFrame) + " NUMFRAMES=" + std::to_string(numFrames) + "\n";
+void FUnrealScriptFile::AddModelImport(const std::string& pskPath) {
+	buf += "#exec MESH MODELIMPORT MESH=" + name + " MODELFILE=" + pskPath + "\n";
+	buf += "#exec MESH LODPARAMS MESH=" + name + " HYSTERESIS=0.00 STRENGTH=0.01 MINVERTS=10.00 MORPH=0.30 ZDISP=0.00\n";
+	buf += "#exec MESH ORIGIN MESH=" + name + " X=0 Y=0 Z=0 YAW=0 PITCH=0 ROLL=0\n";
+}
+
+void FUnrealScriptFile::AddAnimDigest() {
+	buf += "#exec ANIM DIGEST ANIM=" + anim + "\n";
+}
+
+void FUnrealScriptFile::AddAnimImport(const std::string& psaName, const std::string& psaPath) {
+	anim.assign(psaName);
+	buf += "#exec ANIM IMPORT ANIM=" + anim + " ANIMFILE=" + psaPath + " COMPRESS=1\n";
+}
+
+void FUnrealScriptFile::AddAnimSequence(const std::string& seqName, uint32_t startFrame, uint32_t numFrames, uint32_t trackTime) {
+	buf += "#exec MESH SEQUENCE MESH=" + name + " SEQ=" + seqName + " STARTFRAME=" + std::to_string(startFrame) + " NUMFRAMES=" + std::to_string(numFrames);
+	if (trackTime != 0) {
+		buf += " RATE=" + std::to_string(trackTime);
+	}
+	buf += "\n";
 }
 
 void FUnrealScriptFile::AddTexture(const std::string& texName, const std::string& path) {
 	buf += "#exec TEXTURE IMPORT NAME=" + texName + " FILE=" + path + " GROUP=Skins\n";
 }
 
-void FUnrealScriptFile::AddMeshmap(const FVec3f& scale) {
+void FUnrealScriptFile::AddMeshmap() {
 	buf += "#exec MESHMAP NEW MESHMAP=" + name + " MESH=" + name + "\n";
-	buf += "#exec MESHMAP SCALE MESHMAP=" + name + " X=" + std::to_string(scale.v[0]) + " Y=" + std::to_string(scale.v[1]) + " Z=" + std::to_string(scale.v[2]) + "\n\n";
+}
+
+void FUnrealScriptFile::AddMeshmapScale(const FVec3f& scale) {
+	buf += "#exec MESHMAP SCALE MESHMAP=" + name + " X=" + std::to_string(scale.v[0]) + " Y=" + std::to_string(scale.v[1]) + " Z=" + std::to_string(scale.v[2]) + "\n";
+}
+
+void FUnrealScriptFile::SetMeshDefaultAnim() {
+	buf += "#exec MESH DEFAULTANIM MESH=" + name + " ANIM=" + anim + "\n";
 }
 
 void FUnrealScriptFile::SetMeshmapTexture(const std::string& texName, uint32_t index) {
